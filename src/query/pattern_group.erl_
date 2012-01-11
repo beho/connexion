@@ -1,0 +1,122 @@
+-module (pattern_group).
+
+-include ("actor.hrl").
+
+-include ("querying.hrl").
+
+
+methodFor( Selector ) ->
+	case Selector of
+		?M( evaluate );
+		?M( getNext );
+		
+		?DNU_HANDLER
+	end.
+	
+initialize( _Name, PatternGroupSpec ) ->
+	PatternGroupSpec.
+	
+stop( _ ) ->
+	true.
+	
+%% ===== Message handling methods
+
+evaluate( _ , {Receiver, QID}, PatternGroup ) ->
+	Receiver ! {QID, ok},
+	Bindings = successivelyJoinTriplePatterns( PatternGroup ),
+	{ok, Bindings}.
+	
+% if evaluate was not explicitly called before
+getNext( _Count, {Receiver, QID}, PatternGroup ) when is_list(PatternGroup) ->
+	Bindings = successivelyJoinTriplePatterns( PatternGroup ),
+	Receiver ! {QID, Bindings},
+	{ok, Bindings};
+	
+getNext( _Count, {Receiver, QID}, Bindings ) when is_tuple(Bindings) ->
+	Receiver ! {QID, Bindings},
+	{ok, Bindings}.
+	
+%% ====== Helpers
+
+specFor( {_Vars, _Patterns} = PatternGroup ) ->
+	specFor( PatternGroup, []).
+
+specFor( {Vars, Patterns}, Inputs ) ->
+	case length( Vars ) of
+		1 ->
+			OrderedGroup = orderBySelectivity( Patterns ),
+			GroupSize = groupSelectivity( OrderedGroup ),
+			ResultSetSpec = #result_set_spec{ varOrder = Vars, sortKey = Vars, estimate = GroupSize },
+			
+			#pattern_group_spec{ resultSetSpec = ResultSetSpec, triplePatterns = OrderedGroup };
+		2 -> 
+			OrderedGroup = orderBySelectivityAndSortOrder( Patterns, Inputs ),
+			GroupSize = groupSelectivity( OrderedGroup ),
+			
+			LastPattern = lists:last( OrderedGroup ),
+			LastPatternResultSetSpec = LastPattern#triple_pattern_spec.resultSetSpec,
+			VarOrder = LastPatternResultSetSpec#result_set_spec.varOrder,
+			SortKey = LastPatternResultSetSpec#result_set_spec.sortKey,
+			
+			ResultSetSpec = #result_set_spec{ varOrder = VarOrder, sortKey = SortKey, estimate = GroupSize },
+			#pattern_group_spec{ resultSetSpec = ResultSetSpec, triplePatterns = OrderedGroup, inputs = Inputs }
+	end.
+
+% Pattern group cannot be empty (query_support:constructEvaluationTree)
+successivelyJoinTriplePatterns( [Source|Rest] ) ->
+	SourceBindings = triple_pattern:evaluate( Source ),
+	
+	EvaluateAndJoin =
+		fun( Next, CurrentResultBindings ) ->
+			NextBindings = triple_pattern:evaluate( Next ),
+			{CurrentBindingsSorted, NextBindingsSorted} =
+				join:ensureIdenticalSortOrder( CurrentResultBindings, NextBindings ),
+				
+			CurrentBindingsVarOrder = CurrentBindingsSorted#bindings.resultSetSpec#result_set_spec.varOrder,
+			NextBindingsOrder = NextBindingsSorted#bindings.resultSetSpec#result_set_spec.varOrder,
+			
+			% Result sort key
+			JoinSpec = join:specFor( CurrentBindingsVarOrder, NextBindingsOrder ),
+			Joined = join:join( CurrentBindingsSorted, NextBindingsSorted, JoinSpec ),
+			#bindings{ resultSetSpec = #result_set_spec{ varOrder = JoinSpec#join_spec.resultVarOrder }, tuples = Joined }
+		end,
+		
+	lists:foldl( EvaluateAndJoin, SourceBindings, Rest ).
+	
+isMoreSelective( #triple_pattern_spec{ resultSetSpec = Lspec }, #triple_pattern_spec{ resultSetSpec = Rspec } ) ->
+	Lspec#result_set_spec.estimate > Rspec#result_set_spec.estimate. % if estimate is higher, pattern is lesser in final ordering because it is to be used earlier
+
+orderBySelectivity( Patterns ) ->
+	lists:sort( fun isMoreSelective/2, Patterns ).
+		
+orderBySelectivityAndSortOrder( Patterns, _Inputs ) ->
+	lists:sort( fun isMoreSelective/2, Patterns ).
+		
+groupSelectivity( PatternGroup ) ->
+	lists:max( lists:map( fun(Pattern) -> Pattern#triple_pattern_spec.resultSetSpec#result_set_spec.estimate end, PatternGroup) ).
+
+
+
+firstWithCompatibleSortKey( #pattern_group_spec{ triplePatterns = [] }, _ ) ->
+	{nil, []};
+firstWithCompatibleSortKey( #pattern_group_spec{ triplePatterns = [H|T] }, TriplePatternSpec ) ->
+	case join:hasCompatibleSortKey( H#triple_pattern_spec.resultSetSpec, TriplePatternSpec#triple_pattern_spec.resultSetSpec ) of
+		true -> {H, T};
+		false -> 
+			{FirstCompatible, Rest} = firstWithCompatibleSortKey( T, TriplePatternSpec ),
+			{FirstCompatible, [H|Rest]}
+	end.
+	
+firstTriplePattern( #pattern_group_spec{ triplePatterns = [H|_] } ) ->
+	H.
+	
+lastPatternResultSpec( #pattern_group_spec{ triplePatterns = TriplePatterns } ) ->
+	Last = lists:last( TriplePatterns ),
+	Last#triple_pattern_spec.resultSetSpec.
+	
+	
+
+	
+	
+
+

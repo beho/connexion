@@ -1,0 +1,1 @@
+-record (namespaces, { prefixToUri = dict:new(), uriToPrefix = dict:new() }).

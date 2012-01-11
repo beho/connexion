@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF xmlns:cnx="http://www.fit.vutbr.cz/connexion#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#Interpret">
+    <rdfs:subClassOf rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#Me">
+    <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#AmonTobin">
+    <rdf:type rdf:resource="http://www.fit.vutbr.cz/connexion#Interpret"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#OutFromOutWhere">
+    <rdf:type rdf:resource="http://www.fit.vutbr.cz/connexion#Album"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#OutFromOutWhere">
+    <cnx:by rdf:resource="http://www.fit.vutbr.cz/connexion#AmonTobin"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#OutFromOutWhere">
+    <cnx:releaseDate>2003</cnx:releaseDate>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#OutFromOutWhere">
+    <cnx:label rdf:resource="http://www.fit.vutbr.cz/connexion#NinjaTune"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#FoleyRoom">
+    <rdf:type rdf:resource="http://www.fit.vutbr.cz/connexion#Album"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#FoleyRoom">
+    <cnx:by rdf:resource="http://www.fit.vutbr.cz/connexion#AmonTobin"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#FoleyRoom">
+    <cnx:releaseDate>2008</cnx:releaseDate>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#FoleyRoom">
+    <cnx:label rdf:resource="http://www.fit.vutbr.cz/connexion#NinjaTune"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#Autechre">
+    <rdf:type rdf:resource="http://www.fit.vutbr.cz/connexion#Interpret"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#TriRepetae">
+    <rdf:type rdf:resource="http://www.fit.vutbr.cz/connexion#Album"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#TriRepetae">
+    <cnx:by rdf:resource="http://www.fit.vutbr.cz/connexion#Autechre"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#TriRepetae">
+    <cnx:releaseDate>2003</cnx:releaseDate>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#TriRepetae">
+    <cnx:label rdf:resource="http://www.fit.vutbr.cz/connexion#Warp"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#Untilted">
+    <rdf:type rdf:resource="http://www.fit.vutbr.cz/connexion#Album"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#Untilted">
+    <cnx:by rdf:resource="http://www.fit.vutbr.cz/connexion#Autechre"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#Untilted">
+    <cnx:releaseDate>2004</cnx:releaseDate>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#Untilted">
+    <cnx:label rdf:resource="http://www.fit.vutbr.cz/connexion#Warp"/>
+  </rdf:Description>
+</rdf:RDF>

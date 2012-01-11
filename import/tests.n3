@@ -1,0 +1,29 @@
+@prefix cnx: <http://www.fit.vutbr.cz/connexion#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+
+
+cnx:B rdfs:subClassOf cnx:A.
+cnx:C rdfs:subClassOf cnx:B.
+cnx:D rdfs:subClassOf cnx:B.
+
+
+cnx:P2 rdfs:subPropertyOf cnx:P1.
+cnx:P3 rdfs:subPropertyOf cnx:P2.
+cnx:P4 rdfs:subPropertyOf cnx:P2.
+
+
+cnx:P2 rdfs:domain cnx:B.
+cnx:P2 rdfs:range cnx:B.
+
+cnx:a rdf:type cnx:A.
+cnx:b rdf:type cnx:B.
+cnx:c rdf:type cnx:C.
+cnx:d rdf:type cnx:D.
+
+cnx:e cnx:P2 cnx:f.
+cnx:g cnx:P3 cnx:h.
+
+
+
+

@@ -1,0 +1,272 @@
+-module (query_support). % should be named 'query' but it is erlang's keyword.
+-compile(export_all).
+-export ([constructEvaluationTree/1]).
+
+-include ("querying.hrl").
+-include ("vocabularies/rdf.hrl").
+-include ("vocabularies/rdfs.hrl").
+
+
+%-record (query_info, {selectVars, patterns}).
+
+%#query{ vars = [1,2,3], triplePatterns = [{1, rdfs:type, 2}, {"http://example.com/#b", kkk:relatedTo, 2}] }
+
+% TODO add filtering of empty elements
+
+
+
+%query_support:constructEvaluationTree( [{1,"aaa", "bbb"},{"ccc","ddd",1},{1,"eee",2},{2,"xe", 4}, {3, "t", "y"}] ).
+% connexion:setup().
+testOneVarJoin() ->
+	[{_, PID}] = query_support:constructEvaluationTree( [{1, rdf:type(), rdf:property()}, {1, rdfs:domain(), rdfs:resource()}] ),
+	PID ! {getNext, [], {self(), 1}}.
+
+testCnxOneVar() ->
+	[{_, PID}] = query_support:constructEvaluationTree( [{1, rdf:type(), "http://www.fit.vutbr.cz/connexion#Album"}, {1, "http://www.fit.vutbr.cz/connexion#releaseDate", "2003"}, {1, "http://www.fit.vutbr.cz/connexion#label", "http://www.fit.vutbr.cz/connexion#NinjaTune"}] ),
+	PID ! {getNext, [], {self(), 1}}.
+
+testCnx() ->
+	query_support:constructEvaluationTree( [{1, rdf:type(), 2}, {1, "http://www.fit.vutbr.cz/connexion#releaseDate", 3}, {1, "http://www.fit.vutbr.cz/connexion#label", "http://www.fit.vutbr.cz/connexion#NinjaTune"}] ).
+	
+
+% input: [{a, b, c}] where a, b, c is url, var (?x) or literal 
+constructEvaluationTree( TriplePatterns ) ->
+	%{TaggedPatterns, UsedVars} = tagWithVars( TriplePatterns ), % {[{P1, Vars}, ...], [1,2,3]}
+	%EstimatePatterns = estimate( TaggedPatterns ),
+	%io:format( "tagged patterns: ~p~nvars: ~p~n", [TaggedPatterns, UsedVars]),
+	
+	%VarGroups = lists:foldr( 
+	%	fun({Pattern, VarInfos}, Dict) ->
+	%		SortedVarInfos = lists:sort( fun({VarA, _}, {VarB, _}) -> VarA < VarB end, VarInfos ),
+	%		Key = lists:map( fun({Var, _Pos}) -> Var end, SortedVarInfos ),
+	%		NewPatternInfo = {Pattern, SortedVarInfos},
+	%		orddict:update( Key, fun(Val) -> [NewPatternInfo|Val] end, [NewPatternInfo], Dict ) end,
+	%	orddict:new(), TaggedPatterns ),
+	%io:format( "patterns grouped by vars: ~p~n", [VarGroups] ),
+	
+	PatternSpecs = 
+		lists:filter( 
+			fun(Spec) -> Spec#triple_pattern_spec.nature =:= normal end,
+			lists:map( fun triple_pattern:specFor/1, TriplePatterns ) ),
+	io:format( "pattern specs: ~p~n", [PatternSpecs] ),
+		
+	PatternSpecsByVars = lists:foldr( 
+		fun(PatternSpec, Dict) ->
+			Key = ordsets:from_list( PatternSpec#triple_pattern_spec.resultSetSpec#result_set_spec.varOrder ),
+			orddict:update( Key, fun(Val) -> [PatternSpec|Val] end, [PatternSpec], Dict ) end,
+		orddict:new(), PatternSpecs ),
+	io:format( "patterns specs by vars: ~p~n", [PatternSpecsByVars] ),
+	
+	[OneVarGroups, TwoVarGroups] = 
+		lists:map( 
+			fun(Count) -> 
+				lists:filter( fun({Vars, _}) -> length(Vars) == Count end, PatternSpecsByVars )
+			end,
+			[1, 2] ),
+	io:format( "oneVar groups: ~p~ntwoVar groups: ~p~n", [OneVarGroups, TwoVarGroups] ),
+	
+	OneVarGroupSpecs = lists:map( fun pattern_group:specFor/1, OneVarGroups ),
+	TwoVarGroupSpecs = lists:map( fun pattern_group:specFor/1, TwoVarGroups ),
+	io:format( "oneVar specs: ~p~ntwoVar specs: ~p~n", [OneVarGroupSpecs, TwoVarGroupSpecs] ),
+		
+	PotentialGroupsToConnectTo = 
+		lists:map( 
+			fun(#pattern_group_spec{ resultSetSpec = LeafSetSpec }) ->
+				[Var] = LeafSetSpec#result_set_spec.varOrder,
+				lists:filter( 
+					fun(#pattern_group_spec{ resultSetSpec = NodeSetSpec}) ->
+						Vars = NodeSetSpec#result_set_spec.varOrder,
+						lists:member( Var, Vars ) 
+					end, 
+					TwoVarGroupSpecs )
+			end,
+			OneVarGroupSpecs ),
+	io:format( "potential groups: ~p~n", [PotentialGroupsToConnectTo]),
+
+	[H|T] = OneVarGroupSpecs,
+	io:format( "~p~n", [pattern_group:firstWithCompatibleSortKey( TwoVarGroupSpecs, H )]).
+	
+assignOneVarGroupsToTwoVarGroups( OneVarSpecs, TwoVarSpecs ) ->
+	lists:foldl().
+		
+%constructEvaluationBranch( {Vars, PatternGroup} ) ->
+%	pattern_group:evaluatorFor( Ordered ).
+
+	% patterns without variables can be forgotten
+	%[OneVar, TwoVar, ThreeVar] = lists:map( fun(C) -> lists:filter( 
+	%	fun(Pattern) -> varCount( Pattern ) == C end, TaggedPatterns ) end, [1, 2, 3] ),
+	%io:format( "one var patterns: ~p~n", [OneVar] ),
+	
+	%OneVarTrees = lists:map( fun constructOneVarTree/1, groupByVars( OneVar, Vars ) ),
+	%io:format( "one var trees dictionary: ~p~n", [OneVarTrees] ),
+	
+	% patterns grouped by variables occuring in them
+	
+	
+	%EvaluationBranches = lists:map( fun constructEvaluationBranch/1, VarGroups ),
+	
+	%[OneVar, TwoVar] = 
+	%	lists:map( 
+	%		fun(C) -> lists:filter( fun({Vars, _}) -> length( Vars ) == C end, EvaluationBranches ) end,
+	%		[1, 2] )
+			
+	
+	%.
+	%io:format( "evaluation tree: ~p", [EvaluationBranches] ).
+
+	
+	%OneVarTrees = lists:map( fun constructOneVarTree/1, patternGroupsOfLength( VarGroups, 1 ) ),
+	%io:format( "one var trees: ~p~n", [OneVarTrees] ),
+	
+	%TwoVarTrees = lists:map( fun constructTwoVarTree/1, patternGroupsOfLength( VarGroups, 2 ) ),
+	%io:format( "two var trees: ~p~n", [TwoVarTrees] ).
+
+		
+	%LeafPatterns = mostSelectivePatternsForVars( VarGroups ),
+	
+	% TODO construct join structure for each var group
+	
+	%JoinPairs = distinctVarsJoinPairs( VarGroups ),
+	% TODO construct join structure where patterns have overlapping variables
+		
+	%buildQueryTree( ).
+
+%varCount( TriplePattern ) ->
+%	lists:foldl( 
+%		fun(Term, Acc) -> 
+%			if is_integer( Term )
+%				true -> Acc + 1;
+%				false -> Acc
+%			end
+%		end, 0, tuple_to_list( TriplePattern ) ).
+
+
+%constructOneVarTrees( VarGroups ) ->
+	
+
+%tagWithVars( Patterns ) ->
+%	tagWithVars( Patterns, [], ordsets:new() ).
+
+%tagWithVars( [], TaggedPatterns, Vars ) ->
+%	{TaggedPatterns, lists:sort( ordsets:to_list( Vars ) )};
+%tagWithVars( [H|T], TaggedPatterns, Vars ) ->
+%	VarsWithPositions = vars( H ),
+%	V = lists:map( fun({Var, _}) -> Var end, VarsWithPositions ),
+%	tagWithVars( T, [{H, VarsWithPositions}|TaggedPatterns], ordsets:union( Vars, V ) ).
+	
+%vars( Pattern ) when is_tuple( Pattern ) ->
+%	lists:sort( lists:filter( fun is_integer/1, tuple_to_list( Pattern ) ) ).
+
+%vars( Pattern ) ->
+%	TermPostList = lists:zipwith( fun(Term, Position) -> {Term, Position} end, tuple_to_list( Pattern ), [1, 2, 3] ),
+%	lists:filter( fun({Term, _}) -> is_integer( Term ) end, TermPostList ).
+
+	
+	
+%varCount( {_Pattern, Vars} ) ->
+%	length( Vars ).
+
+%hasVarCount( TriplePattern, ExpectedCount ) ->
+%	Count == varCount( TriplePattern ).
+	
+%containsVar( {_Pattern, Vars}, Var ) ->
+%	lists:member( Var, Vars ).
+	
+%patternGroupsOfLength( Groups, Length) ->
+%	lists:filter( fun({Vars, _Patterns}) -> length(Vars) == Length end, Groups ).
+	
+%groupByVars( TaggedPatterns, Vars ) ->
+%	Grouped = 
+%		lists:map(
+%			fun(Var) -> {Var, lists:filter( fun(Pattern) -> containsVar( Pattern, Var ) end, TaggedPatterns )} end,
+%			Vars ),
+			
+%	lists:foldr(
+%		fun({Var, Patterns}, Dict) -> orddict:store( Var, lists:map( fun({Pattern, _}) -> {Pattern, selectivity( Pattern )} end, Patterns ), Dict) end,
+%		orddict:new(),
+%		Grouped ).
+
+%eEconstructEvaluationBranch( {Vars, Patterns}) ->
+%	case length( Vars ) of
+%		1 -> {Vars, constructOneVarEvaluationBranch( Patterns )};
+%		2 -> {Vars, constructTwoVarEvaluationBranch( Patterns )}
+%	end.
+
+
+	
+	% for each pattern instantiate a triple_pattern_result node and return pair {Node, VarInfo}.
+%	CreateTriplePatternFun =
+%		fun({Pattern, VarInfos}) ->
+%			ModifiedPattern = replaceVarsWithMarkers( Pattern, VarInfos ),
+%			triple_pattern:actorFor( {ModifiedPattern, VarInfos} )
+%		end,
+	
+%	[{Source, _} = SourceInfo|Rest] = lists:map( CreateTriplePatternFun, Ordered ),
+		
+%	QID = make_ref(),
+%	Source ! {execute, [], {self(), QID}},
+
+	% combine current root with next triple pattern result using join (starting with most selective pattern).
+%	BranchRoot = 
+%		lists:foldl( 
+%			fun(Node, CurrentRoot) ->
+%				join:nodes( CurrentRoot, Node ) end,
+%			SourceInfo, Rest ),
+	
+%	receive
+%		{QID, ok} -> {Vars, BranchRoot}
+%	end.
+	
+%constructTwoVarEvaluationBranch( {Patterns} ) ->
+%	Ordered = orderBySelectivity( Patterns ),
+	
+%	CreateTriplePatternFun =
+%		fun({Pattern, VarInfos}) ->
+%			{S, P, O} = replaceVarsWithMarkers( Pattern, VarInfos ),
+%			{triple_pattern_result:for( S, P, O ), VarInfos}
+%		end,
+		
+%	[Source|Rest] = lists:map( CreateTriplePatternFun, Ordered ),
+	
+%	QID = make_ref(),
+%	Source ! {execute, [], self(), QID}.
+	
+	%BranchRoot = lists:foldl(
+	%	fun(Node, CurrentRoot) -> join:nodes( {CurrentRoot})
+	%) 
+	
+%replaceVarsWithMarkers( Pattern, VarInfos ) ->
+%	lists:foldr( 
+%		fun({_, Position}, ModifiedPattern ) -> setelement( Position, ModifiedPattern, ?VAR_MARKER ) end,
+%	 	Pattern, VarInfos ).
+	
+%joinNodes( LNode, RNode ) ->
+	
+%estimate( [] ) ->
+%	[];
+%estimate( [H|T] ) ->
+%	[{H, selectivity(H)}|estimate(T)].
+
+%selectivity( _Pattern ) ->
+%	0.
+
+	
+	
+	%lists:foldl( fun(Term, Acc) -> (Term == Var) and Acc end, false, List ).
+	
+%mostSelectivePatternsForVars( VarGroups ) ->
+	%include number of vars in a pattern and potential size of a result.
+	
+%distinctVarsJoinPairs( VarGroups ) ->
+%	RelevantVarPatterns =
+%		lists:map( fun(G) -> lists:filter( fun(Pattern) -> varCount( Pattern ) > 1 end, G ) end, VarGroups ).
+		
+	% TODO filter empty groups + CHANGE VAR GROUPS ENCODING TO INCLUDE ACTUAL VARIABLE 
+	
+	
+
+	
+
+	
+
+	

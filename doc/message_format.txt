@@ -1,0 +1,7 @@
+request:
+	{selector, Args, {Receiver, QID}}
+	
+	Receiver can be 'nil' if response is not expected.
+
+response:
+	{QID, Args}

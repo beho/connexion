@@ -1,0 +1,70 @@
+-module (class_tests).
+
+-include_lib("eunit/include/eunit.hrl").
+
+
+generate_class_test_() ->
+	{inorder, {setup,
+	 fun setup/0, fun teardown/1,
+	[?_test(add()),
+	 ?_test(contains_true()),
+	 ?_test(contains_false()),
+	 ?_test(size()),
+%	 ?_test(size_call()),
+	 ?_test(individuals())]
+	}}.
+	
+setup() ->
+	actor_class:new(egg).
+	
+teardown( _ ) ->
+	class:stop(egg).
+	
+add() ->
+	Ref = make_ref(),
+	gen_server:cast(egg, {add, "http://egg.com/red", {self(), Ref}}),
+	receive
+		Msg -> ?assertEqual( Msg, {'$gen_cast',{Ref,ok}} )
+	end,
+	
+	gen_server:cast(egg, {add, "http://egg.com/green", {self(), Ref}}),
+	receive
+		Msg1 -> ?assertEqual( Msg1, {'$gen_cast',{Ref,ok}} )
+	end,
+	
+	gen_server:cast(egg, {add, "http://egg.com/yellow", {self(), Ref}}),
+	receive
+		Msg2 -> ?assertEqual( Msg2, {'$gen_cast',{Ref,ok}} )
+	end.
+
+contains_true() ->
+	Ref =  make_ref(),
+	gen_server:cast(egg, {contains, "http://egg.com/green", {self(), Ref}}),
+	receive
+		{'$gen_cast', {Ref, Res}} -> ?assertEqual( Res, true )
+	end.
+
+contains_false() ->
+	Ref = make_ref(),
+	gen_server:cast(egg, {contains, "http://egg.com/pink", {self(), Ref}}),
+	receive
+		{'$gen_cast', {Ref, Res}} -> ?assertEqual( Res, false )
+	end.
+	
+
+size() ->
+	Ref = make_ref(),
+	gen_server:cast(egg, {size, {self(), Ref}}),
+	receive
+		{'$gen_cast',{Ref, Size}} -> ?assertEqual( Size, 3 )
+	end.
+	
+size_call() ->
+	?assertEqual( gen_server:call(egg, size), 3 ).
+
+individuals() ->
+	Ref = make_ref(),
+	gen_server:cast(egg, {individuals, {self(), Ref}}),
+	receive
+		{'$gen_cast',{Ref, List}} -> ?assertEqual( List, ["http://egg.com/green", "http://egg.com/red", "http://egg.com/yellow"] )
+	end.

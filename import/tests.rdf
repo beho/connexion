@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF xmlns:cnx="http://www.fit.vutbr.cz/connexion#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#B">
+    <rdfs:subClassOf rdf:resource="http://www.fit.vutbr.cz/connexion#A"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#C">
+    <rdfs:subClassOf rdf:resource="http://www.fit.vutbr.cz/connexion#B"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#D">
+    <rdfs:subClassOf rdf:resource="http://www.fit.vutbr.cz/connexion#B"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#P2">
+    <rdfs:subPropertyOf rdf:resource="http://www.fit.vutbr.cz/connexion#P1"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#P3">
+    <rdfs:subPropertyOf rdf:resource="http://www.fit.vutbr.cz/connexion#P2"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#P4">
+    <rdfs:subPropertyOf rdf:resource="http://www.fit.vutbr.cz/connexion#P2"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#P2">
+    <rdfs:domain rdf:resource="http://www.fit.vutbr.cz/connexion#B"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#P2">
+    <rdfs:range rdf:resource="http://www.fit.vutbr.cz/connexion#B"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#a">
+    <rdf:type rdf:resource="http://www.fit.vutbr.cz/connexion#A"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#b">
+    <rdf:type rdf:resource="http://www.fit.vutbr.cz/connexion#B"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#c">
+    <rdf:type rdf:resource="http://www.fit.vutbr.cz/connexion#C"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#d">
+    <rdf:type rdf:resource="http://www.fit.vutbr.cz/connexion#D"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#e">
+    <cnx:P2 rdf:resource="http://www.fit.vutbr.cz/connexion#f"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.fit.vutbr.cz/connexion#g">
+    <cnx:P3 rdf:resource="http://www.fit.vutbr.cz/connexion#h"/>
+  </rdf:Description>
+</rdf:RDF>

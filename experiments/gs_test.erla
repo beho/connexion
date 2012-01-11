@@ -1,0 +1,45 @@
+-module (gs_test).
+
+-export ([start/0, stop/0, test/1]).
+-export ([init/1, handle_cast/2, handle_call/3]).
+
+-behaviour (gen_server).
+
+
+
+start() ->
+	gen_server:start({local, ?MODULE}, ?MODULE, nil, []).
+	
+stop() ->
+	gen_server:cast(?MODULE, stop).
+	
+
+init(Arg) ->
+	{ok, Arg}.
+	
+handle_cast(stop, LoopData) ->
+	{stop, normal, LoopData};
+	
+handle_cast(ping, LoopData) ->
+	receive 
+	after 5000 ->
+		io:format("pong~n"),
+		{noreply, LoopData}
+	end.
+	
+	
+handle_call(ping, _From, LoopData) ->
+	try (receive after 5000 -> ok end) of
+		V -> V
+	catch
+		_:_ ->
+			io:format("pong~n"),
+			{reply, pong, LoopData}
+	end.
+	
+test(call) ->
+	gen_server:call(?MODULE, ping),
+	io:format("after call~n");
+test(cast) ->
+	gen_server:cast(?MODULE, ping),
+	io:format("after cast~n").

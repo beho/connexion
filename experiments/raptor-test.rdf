@@ -1,0 +1,8 @@
+<rdf:RDF
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:test="http://test.com/ontology#" >
+	
+	<test:Class rdf:about="http://test.com/data/individual-1">
+		<test:hasProblem rdf:resource="http://test.com/data/problem-1" />
+	</test:Class>
+</rdf:RDF>

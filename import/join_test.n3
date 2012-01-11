@@ -1,0 +1,52 @@
+@prefix cnx: <http://www.fit.vutbr.cz/connexion#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix foaf: <http://xmlns.com/foaf/0.1/>.
+
+cnx:Interpret rdfs:subClassOf foaf:Person.
+
+cnx:Me rdf:type foaf:Person.
+
+cnx:AmonTobin rdf:type cnx:Interpret.
+
+cnx:OutFromOutWhere rdf:type cnx:Album;
+	cnx:by cnx:AmonTobin;
+	cnx:releaseDate "2003";
+	cnx:label cnx:NinjaTune.
+
+cnx:FoleyRoom rdf:type cnx:Album;
+	cnx:by cnx:AmonTobin;
+	cnx:releaseDate "2008";
+	cnx:label cnx:NinjaTune.
+	
+cnx:Autechre rdf:type cnx:Interpret.
+
+cnx:TriRepetae rdf:type cnx:Album;
+	cnx:by cnx:Autechre;
+	cnx:releaseDate "2003";
+	cnx:label cnx:Warp.
+	
+cnx:Untilted rdf:type cnx:Album;
+	cnx:by cnx:Autechre;
+	cnx:releaseDate "2004";
+	cnx:label cnx:Warp.
+
+# [{_, {PID, _}}] = query_support:buildQueryStructure( [{1, rdf:type(), "http://www.fit.vutbr.cz/connexion#Album"}, {1, "http://www.fit.vutbr.cz/connexion#releaseDate", "2003"}, {1, "http://www.fit.vutbr.cz/connexion#label", "http://www.fit.vutbr.cz/connexion#Warp"}] ).
+
+[
+	[],
+    {<0.86.0>,#Ref<0.0.0.791>},
+	{
+		{
+			{'_',"http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.fit.vutbr.cz/connexion#Album"},
+            [{1,1}]
+		},
+        {[1],
+            ["http://www.fit.vutbr.cz/connexion#FoleyRoom",
+             "http://www.fit.vutbr.cz/connexion#OutFromOutWhere",
+             "http://www.fit.vutbr.cz/connexion#TriRepetae",
+             "http://www.fit.vutbr.cz/connexion#Untilted"]
+		}
+	}
+]
+	

@@ -1,0 +1,48 @@
+P = evaluation_tree:build([{1, "http://semantics.crl.ibm.com/univ-bench-dl.owl#enrollIn", "http://www.Department13.University11.edu"}, {1, "http://semantics.crl.ibm.com/univ-bench-dl.owl#takesCourse", 2}, {1, "http://semantics.crl.ibm.com/univ-bench-dl.owl#hasMajor", 3}, {1, rdf:type(),4}]).
+
+non-reducing tree evaluation:
+	start
+	[{total,8201528},
+	 {processes,1577560},
+	 {processes_used,1572360},
+	 {system,6623968},
+	 {atom,468257},
+	 {atom_used,446954},
+	 {binary,57392},
+	 {code,3877300},
+	 {ets,615136}]
+	
+	end
+	[{total,349161080},
+	 {processes,299621096},
+	 {processes_used,299610016},
+	 {system,49539984},
+	 {atom,493417},
+	 {atom_used,487857},
+	 {binary,79296},
+	 {code,4029027},
+	 {ets,43229880}]
+	
+	
+reducing tree evaluation
+	start
+	[{total,8195216},
+	 {processes,1590336},
+	 {processes_used,1585136},
+	 {system,6604880},
+	 {atom,468257},
+	 {atom_used,446954},
+	 {binary,38248},
+	 {code,3877300},
+	 {ets,615136}]
+	
+	end
+	[{total,291859904},
+	 {processes,242373192},
+	 {processes_used,242362112},
+	 {system,49486712},
+	 {atom,493417},
+	 {atom_used,487846},
+	 {binary,67512},
+	 {code,4028915},
+	 {ets,43229952}]
